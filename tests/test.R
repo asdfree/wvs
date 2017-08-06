@@ -6,14 +6,18 @@ wvs_cat <-
 	get_catalog( "wvs" ,
 		output_dir = file.path( getwd() ) )
 
-# 2015 only
-wvs_cat <- subset( wvs_cat , year == 2015 )
+# wave six only
+wvs_cat <- subset( wvs_cat , grepl( "United(.*)States" , full_url ) & wave == 6 )
 # download the microdata to your local computer
 stopifnot( nrow( wvs_cat ) > 0 )
 
 library(survey)
 
-wvs_df <- readRDS( file.path( getwd() , "2015 main.rds" ) )
+wvs_df <-
+	readRDS( 
+		file.path( getwd() , 
+			"wave 6/F00003106-WV6_Data_United_States_2011_spss_v_2016-01-01.rds" ) 
+	)
 
 wvs_design <- 
 	svydesign( 
@@ -119,12 +123,4 @@ wvs_srvyr_design %>%
 wvs_srvyr_design %>%
 	group_by( ever_smoked_marijuana ) %>%
 	summarize( mean = survey_mean( bmipct , na.rm = TRUE ) )
-
-unwtd.count( ~ never_rarely_wore_bike_helmet , yrbss_design )
-
-svytotal( ~ one , subset( yrbss_design , !is.na( never_rarely_wore_bike_helmet ) ) )
- 
-svymean( ~ never_rarely_wore_bike_helmet , yrbss_design , na.rm = TRUE )
-
-svyciprop( ~ never_rarely_wore_bike_helmet , yrbss_design , na.rm = TRUE , method = "beta" )
 
