@@ -43,9 +43,9 @@ wvs_design <-
 
 		citizen = as.numeric( v246 == 1 ) ,
 		
-		task_creativity_1_10 = v232 ,
+		task_creativity_1_10 = as.numeric( v232 ) ,
 		
-		work_independence_1_10 = v233 ,
+		work_independence_1_10 = as.numeric( v233 ) ,
 		
 		family_importance =
 			factor( v4 , 
