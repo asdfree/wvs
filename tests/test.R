@@ -19,46 +19,62 @@ wvs_df <-
 			"wave 6/F00003106-WV6_Data_United_States_2011_spss_v_2016-01-01.rds" ) 
 	)
 
+# construct a fake survey design
+warning( "this survey design produces correct point estimates
+but incorrect standard errors." )
 wvs_design <- 
 	svydesign( 
-		~ psu , 
-		strata = ~ stratum , 
+		~ 1 , 
 		data = wvs_df , 
-		weights = ~ weight , 
-		nest = TRUE 
+		weights = ~ v258
 	)
 wvs_design <- 
 	update( 
 		wvs_design , 
-		q2 = q2 ,
-		never_rarely_wore_bike_helmet = as.numeric( qn8 == 1 ) ,
-		ever_smoked_marijuana = as.numeric( qn47 == 1 ) ,
-		ever_tried_to_quit_cigarettes = as.numeric( q36 > 2 ) ,
-		smoked_cigarettes_past_year = as.numeric( q36 > 1 )
+		
+		one = 1 ,
+		
+		language_spoken_at_home =
+			factor( v247 , 
+				levels = c( 101 , 128 , 144 , 208 , 426 , 800 ) , 
+				labels = c( 'chinese' , 'english' , 'french' , 
+					'japanese' , 'spanish; castilian' , 'other' )
+			) ,
+
+		citizen = as.numeric( v246 == 1 ) ,
+		
+		task_creativity_1_10 = v232 ,
+		
+		work_independence_1_10 = v233 ,
+		
+		family_importance =
+			factor( v4 , 
+				labels = c( 'very' , 'rather' , 'not very' , 'not at all' ) 
+			)
 	)
 sum( weights( wvs_design , "sampling" ) != 0 )
 
-svyby( ~ one , ~ ever_smoked_marijuana , wvs_design , unwtd.count )
+svyby( ~ one , ~ language_spoken_at_home , wvs_design , unwtd.count )
 svytotal( ~ one , wvs_design )
 
-svyby( ~ one , ~ ever_smoked_marijuana , wvs_design , svytotal )
-svymean( ~ bmipct , wvs_design , na.rm = TRUE )
+svyby( ~ one , ~ language_spoken_at_home , wvs_design , svytotal )
+svymean( ~ task_creativity_1_10 , wvs_design , na.rm = TRUE )
 
-svyby( ~ bmipct , ~ ever_smoked_marijuana , wvs_design , svymean , na.rm = TRUE )
-svymean( ~ q2 , wvs_design , na.rm = TRUE )
+svyby( ~ task_creativity_1_10 , ~ language_spoken_at_home , wvs_design , svymean , na.rm = TRUE )
+svymean( ~ family_importance , wvs_design , na.rm = TRUE )
 
-svyby( ~ q2 , ~ ever_smoked_marijuana , wvs_design , svymean , na.rm = TRUE )
-svytotal( ~ bmipct , wvs_design , na.rm = TRUE )
+svyby( ~ family_importance , ~ language_spoken_at_home , wvs_design , svymean , na.rm = TRUE )
+svytotal( ~ task_creativity_1_10 , wvs_design , na.rm = TRUE )
 
-svyby( ~ bmipct , ~ ever_smoked_marijuana , wvs_design , svytotal , na.rm = TRUE )
-svytotal( ~ q2 , wvs_design , na.rm = TRUE )
+svyby( ~ task_creativity_1_10 , ~ language_spoken_at_home , wvs_design , svytotal , na.rm = TRUE )
+svytotal( ~ family_importance , wvs_design , na.rm = TRUE )
 
-svyby( ~ q2 , ~ ever_smoked_marijuana , wvs_design , svytotal , na.rm = TRUE )
-svyquantile( ~ bmipct , wvs_design , 0.5 , na.rm = TRUE )
+svyby( ~ family_importance , ~ language_spoken_at_home , wvs_design , svytotal , na.rm = TRUE )
+svyquantile( ~ task_creativity_1_10 , wvs_design , 0.5 , na.rm = TRUE )
 
 svyby( 
-	~ bmipct , 
-	~ ever_smoked_marijuana , 
+	~ task_creativity_1_10 , 
+	~ language_spoken_at_home , 
 	wvs_design , 
 	svyquantile , 
 	0.5 ,
@@ -67,14 +83,14 @@ svyby(
 	na.rm = TRUE
 )
 svyratio( 
-	numerator = ~ ever_tried_to_quit_cigarettes , 
-	denominator = ~ smoked_cigarettes_past_year , 
+	numerator = ~ task_creativity_1_10 , 
+	denominator = ~ work_independence_1_10 , 
 	wvs_design ,
 	na.rm = TRUE
 )
-sub_wvs_design <- subset( wvs_design , qn41 == 1 )
-svymean( ~ bmipct , sub_wvs_design , na.rm = TRUE )
-this_result <- svymean( ~ bmipct , wvs_design , na.rm = TRUE )
+sub_wvs_design <- subset( wvs_design , v242 >= 65 )
+svymean( ~ task_creativity_1_10 , sub_wvs_design , na.rm = TRUE )
+this_result <- svymean( ~ task_creativity_1_10 , wvs_design , na.rm = TRUE )
 
 coef( this_result )
 SE( this_result )
@@ -83,8 +99,8 @@ cv( this_result )
 
 grouped_result <-
 	svyby( 
-		~ bmipct , 
-		~ ever_smoked_marijuana , 
+		~ task_creativity_1_10 , 
+		~ language_spoken_at_home , 
 		wvs_design , 
 		svymean ,
 		na.rm = TRUE 
@@ -95,22 +111,22 @@ SE( grouped_result )
 confint( grouped_result )
 cv( grouped_result )
 degf( wvs_design )
-svyvar( ~ bmipct , wvs_design , na.rm = TRUE )
+svyvar( ~ task_creativity_1_10 , wvs_design , na.rm = TRUE )
 # SRS without replacement
-svymean( ~ bmipct , wvs_design , na.rm = TRUE , deff = TRUE )
+svymean( ~ task_creativity_1_10 , wvs_design , na.rm = TRUE , deff = TRUE )
 
 # SRS with replacement
-svymean( ~ bmipct , wvs_design , na.rm = TRUE , deff = "replace" )
-svyciprop( ~ never_rarely_wore_bike_helmet , wvs_design ,
+svymean( ~ task_creativity_1_10 , wvs_design , na.rm = TRUE , deff = "replace" )
+svyciprop( ~ citizen , wvs_design ,
 	method = "likelihood" , na.rm = TRUE )
-svyttest( bmipct ~ never_rarely_wore_bike_helmet , wvs_design )
+svyttest( task_creativity_1_10 ~ citizen , wvs_design )
 svychisq( 
-	~ never_rarely_wore_bike_helmet + q2 , 
+	~ citizen + family_importance , 
 	wvs_design 
 )
 glm_result <- 
 	svyglm( 
-		bmipct ~ never_rarely_wore_bike_helmet + q2 , 
+		task_creativity_1_10 ~ citizen + family_importance , 
 		wvs_design 
 	)
 
@@ -118,9 +134,9 @@ summary( glm_result )
 library(srvyr)
 wvs_srvyr_design <- as_survey( wvs_design )
 wvs_srvyr_design %>%
-	summarize( mean = survey_mean( bmipct , na.rm = TRUE ) )
+	summarize( mean = survey_mean( task_creativity_1_10 , na.rm = TRUE ) )
 
 wvs_srvyr_design %>%
-	group_by( ever_smoked_marijuana ) %>%
-	summarize( mean = survey_mean( bmipct , na.rm = TRUE ) )
+	group_by( language_spoken_at_home ) %>%
+	summarize( mean = survey_mean( task_creativity_1_10 , na.rm = TRUE ) )
 
