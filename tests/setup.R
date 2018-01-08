@@ -1,7 +1,5 @@
 if ( .Platform$OS.type == 'windows' ) memory.limit( 256000 )
 
-library(lodown)
-lodown( "wvs" , output_dir = file.path( getwd() ) )
 this_sample_break <- Sys.getenv( "this_sample_break" )
 wvs_cat <- get_catalog( "wvs" , output_dir = file.path( getwd() ) )
 record_categories <- ceiling( seq( nrow( wvs_cat ) ) / ceiling( nrow( wvs_cat ) / 5 ) )
@@ -17,7 +15,7 @@ wvs_cat <-
 # wave six only
 wvs_cat <- subset( wvs_cat , grepl( "United(.*)States" , full_url ) & wave == 6 )
 # download the microdata to your local computer
-lodown( "wvs" , wvs_cat )
+
 
 library(survey)
 
