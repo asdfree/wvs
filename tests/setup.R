@@ -7,17 +7,17 @@ this_sample_break <- Sys.getenv( "this_sample_break" )
 wvs_cat <- get_catalog( "wvs" , output_dir = file.path( getwd() ) )
 record_categories <- ceiling( seq( nrow( wvs_cat ) ) / ceiling( nrow( wvs_cat ) / 5 ) )
 wvs_cat <- wvs_cat[ record_categories == this_sample_break , ]
-lodown( "wvs" , wvs_cat )
+wvs_cat <- lodown( "wvs" , wvs_cat )
 if( any( grepl( "United(.*)States" , wvs_cat$full_url ) & wvs_cat$wave == 6 ) ){
-library(lodown)
-# examine all available WVS microdata files
-wvs_cat <-
-	get_catalog( "wvs" ,
-		output_dir = file.path( getwd() ) )
 
-# wave six only
-wvs_cat <- subset( wvs_cat , grepl( "United(.*)States" , full_url ) & wave == 6 )
-# download the microdata to your local computer
+
+
+
+
+
+
+
+
 
 
 library(survey)
